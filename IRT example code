@@ -1,0 +1,333 @@
+library(lavaan)
+library(haven)
+library(semPlot)
+library(stats4)
+library(lattice)
+library(MASS)
+library(msm)
+library(polycor)
+library(mirt)
+library(ltm)
+library(sirt)
+
+#load data set
+Imp_1 <- read_sav("____")
+
+#Opens data viewer
+View(Imp_1_NU)
+
+#Seperate subscales into different data sets
+Imp_1_Imp = Imp_1[ , c(32, 41, 49, 57, 65, 73, 81, 89, 97, 104, 110, 113, 122, 181, 191, 203, 210, 245, 54, 67, 83, 108, 116, 134, 150, 209, 212, 25, 33, 50, 69, 77, 85, 102, 114, 188, 198, 207, 214, 221, 228, 246, 173, 47, 55, 63, 68, 76, 84, 92, 30, 39, 148, 158, 163, 166, 167, 169, 186, 187, 190, 202, 236, 27, 52, 60, 101, 120)]
+Imp_1_PU = Imp_1[ , c(32, 41, 49, 57, 65, 73, 81, 89, 97, 104, 110, 113, 122)]
+Imp_1_SS = Imp_1[ , c(181, 191, 203, 210, 245, 54, 67, 83, 108, 116)]
+Imp_1_Prem = Imp_1[ , c(134, 150, 209, 212, 25, 33, 50, 69, 77, 85, 102, 114)]
+Imp_1_EmIn = Imp_1[ , c(188, 198, 207, 214, 221, 228, 246)]
+Imp_1_Pers = Imp_1[ , c(173, 47, 55, 63, 68, 76, 84, 92, 30, 39)]
+Imp_1_NU = Imp_1[ , c(148, 158, 163, 166, 167, 169, 186, 187, 190, 202, 236, 27, 52, 60, 101, 120)]
+
+
+
+
+
+
+
+
+###Positive urgency subscales
+
+
+#Assuming they are all measuring the one latent variable
+IRTmodel_PU = mirt(Imp_1_PU, 
+                   model = 1, 
+                   itemtype = "graded") #alternative for other models gpcm
+
+#Get parameters
+summary(IRTmodel_PU)    #standardised
+coef(IRTmodel_PU, IRTpars = T)  #coeficients
+
+#Local independence check
+residuals(IRTmodel_PU, type = "Q3") #below .2 ideal, below .3 questionable but acceptable 
+
+#Plots
+
+#curves per item
+itemplot(IRTmodel_NU, 10, type = "trace") 
+#curves all items
+plot(IRTmodel_PU, type = "trace") 
+
+#Information curve per item
+itemplot(IRTmodel_PU, 1, type = "info") 
+##Plot all the information curves
+plot(IRTmodel_PU, type='infotrace', which.item = c(1,2,3,4,5,6,7,8,9,10), facet_items=T, 
+     as.table = TRUE, auto.key=list(points=F, lines=T, columns=1, space = 'right', cex = .8), 
+     theta_lim = c(-3, 3), 
+     main="") 
+
+#Information curve for entire subscale
+plot(IRTmodel_PU, type = "info") 
+
+#expected score curve
+plot(IRTmodel_PU) 
+
+
+#Item fit
+itemfit(IRTmodel_PU)
+
+personfit(IRTmodel_PU)
+
+
+
+##PU redefine with less items (can remove individual items for various reasons, then re-run above code for comparisons)
+Imp_1_PU = Imp_1[ , c(41, 49, 57, 65, 73, 81, 89, 97, 104, 110)]
+
+
+
+
+
+
+
+
+
+
+
+
+
+###Negative urgency subscales
+
+
+#Assuming they are all measuring the one latent variable
+IRTmodel_NU = mirt(Imp_1_NU, 
+                   model = 1, 
+                   itemtype = "graded")
+
+#Get parameters
+summary(IRTmodel_NU)    #standardised
+coef(IRTmodel_NU, IRTpars = T)  #coeficients
+
+#Local independence check
+residuals(IRTmodel_NU, type = "Q3")
+
+#Plots
+
+#curves per item
+itemplot(IRTmodel_NU, 13, type = "trace") 
+#curves all items
+plot(IRTmodel_NU, type = "trace") 
+
+#Information curve per item
+itemplot(IRTmodel_NU, 1, type = "info") 
+##Plot all the information curves
+plot(IRTmodel_NU, type='infotrace', which.item = c(1,2,3,4,5,6,7), facet_items=T, 
+     as.table = TRUE, auto.key=list(points=F, lines=T, columns=1, space = 'right', cex = .8), 
+     theta_lim = c(-3, 3), 
+     main="")
+
+#Information curve for entire subscale
+plot(IRTmodel_NU, type = "info") 
+
+expected score curve
+plot(IRTmodel_NU) #
+
+
+#Item fit
+itemfit(IRTmodel_NU)
+
+personfit(IRTmodel_NU)
+
+
+
+##NU redefine with less items (can remove individual items for various reasons, then re-run above code for comparisons)
+
+Imp_1_NU = Imp_1[ , c(163, 166, 167, 27, 52, 60, 120)]
+
+
+
+
+
+
+
+###Sensation seeking subscales
+
+
+#Assuming they are all measuring the one latent variable
+IRTmodel_SS = mirt(Imp_1_SS, 
+                   model = 1, 
+                   itemtype = "graded")
+
+#Get parameters
+summary(IRTmodel_SS)    #standardised
+coef(IRTmodel_SS, IRTpars = T)  #coeficients
+
+#Local dependence check
+residuals(IRTmodel_SS, type = "Q3")
+
+
+#Plots
+
+#curves per item
+itemplot(IRTmodel_SS, 13, type = "trace") 
+#curves all items
+plot(IRTmodel_SS, type = "trace") 
+
+#Information curve per item
+itemplot(IRTmodel_SS, 1, type = "info") 
+##Plot all the information curves
+plot(IRTmodel_SS, type='infotrace', which.item = c(1,2,3,4,5), facet_items=T, 
+     as.table = TRUE, auto.key=list(points=F, lines=T, columns=1, space = 'right', cex = .8), 
+     theta_lim = c(-3, 3), 
+     main="") 
+
+#Information curve for entire subscale
+plot(IRTmodel_SS, type = "info") 
+
+#expected score curve
+plot(IRTmodel_SS) 
+
+
+#Item fit
+itemfit(IRTmodel_SS)
+
+personfit(IRTmodel_SS)
+
+
+
+##SS redefine with less items (can remove individual items for various reasons, then re-run above code for comparisons)
+Imp_1_SS = Imp_1[ , c(54, 67, 83, 108, 116)]
+
+
+
+
+
+
+
+
+
+
+###lack of Pers subscales
+
+
+#Assuming they are all measuring the one latent variable
+IRTmodel_Pers = mirt(Imp_1_Pers, 
+                   model = 1, 
+                   itemtype = "graded")
+
+#Get parameters
+summary(IRTmodel_Pers)    #standardised
+coef(IRTmodel_Pers, IRTpars = T)  #coeficients
+residuals(IRTmodel_Pers, type = "Q3")
+
+#Plots
+
+#curves per item
+itemplot(IRTmodel_Pers, 13, type = "trace") 
+#curves all items
+plot(IRTmodel_Pers, type = "trace") 
+
+#Information curve per item
+itemplot(IRTmodel_Pers, 1, type = "info") 
+##Plot all the information curves
+plot(IRTmodel_Pers, type='infotrace', which.item = c(1,2,3,4), facet_items=T, 
+     as.table = TRUE, auto.key=list(points=F, lines=T, columns=1, space = 'right', cex = .8), 
+     theta_lim = c(-3, 3), 
+     main="") 
+
+#Information curve for entire subscale
+plot(IRTmodel_Pers, type = "info")
+
+#expected score curve
+plot(IRTmodel_Pers) 
+
+
+#Item fit
+itemfit(IRTmodel_Pers)
+
+personfit(IRTmodel_Pers)
+
+
+
+##Pers redefine with less items (can remove individual items for various reasons, then re-run above code for comparisons)
+Imp_1_Pers = Imp_1[ , c(30, 68, 84, 92)]
+
+
+
+
+
+###lack of Prem subscales
+
+
+#Assuming they are all measuring the one latent variable
+IRTmodel_Prem = mirt(Imp_1_Prem, 
+                     model = 1, 
+                     itemtype = "graded")
+
+#Get parameters
+summary(IRTmodel_Prem)    #standardised
+coef(IRTmodel_Prem, IRTpars = T)  #coeficients
+
+#Local dependence check
+residuals(IRTmodel_Prem, type = "Q3")
+
+#Plots
+#curves per item
+itemplot(IRTmodel_Prem, 13, type = "trace") 
+#curves all items
+plot(IRTmodel_Prem, type = "trace") 
+
+#Information curve per item
+itemplot(IRTmodel_Prem, 1, type = "info") 
+##Plot all the information curves
+plot(IRTmodel_Prem, type='infotrace', which.item = c(1,2,3,4,5,6,7,8), facet_items=T, 
+     as.table = TRUE, auto.key=list(points=F, lines=T, columns=1, space = 'right', cex = .8), 
+     theta_lim = c(-3, 3), 
+     main="") 
+
+#Information curve for entire subscale
+plot(IRTmodel_Prem, type = "info") 
+
+#expected score curve
+plot(IRTmodel_Prem) 
+
+
+#Item fit
+itemfit(IRTmodel_Prem)
+
+personfit(IRTmodel_Prem)
+
+
+
+##Prem redefine with less items (can remove individual items for various reasons, then re-run above code for comparisons)
+Imp_1_Prem = Imp_1[ , c(134, 150, 33, 50, 69, 77, 102, 114)]
+
+
+
+
+
+
+
+
+###EmIn subscale
+
+
+#3PL of EmIn
+IRTmodel_EmIn_3pl = tpm(Imp_1_EmIn, type = "latent.trait", IRT.param = TRUE)
+mirt::residuals(IRTmodel_EmIn_3pl, type = "Q3")
+
+#rasch alternative to mirt to find q3
+EmInMod <- rasch.mml2(Imp_1_EmIn)
+EmInMod$item
+EmInMod.wle <- wle.rasch( dat = Imp_1_EmIn , b = EmInMod$item$b )
+EmInMod.q3 <- Q3( dat = Imp_1_EmIn , theta = EmInMod.wle$theta , b = EmInMod$item$b )
+EmInMod.q3
+
+#Get parameters
+summary(IRTmodel_EmIn_3pl)
+coef(IRTmodel_EmIn_3pl)
+
+#Plots
+plot(IRTmodel_EmIn_3pl, type = "ICC")
+plot(IRTmodel_EmIn_3pl, type = "IIC", items = 0)
+factor.scores(IRTmodel_EmIn_3pl)
+person.fit(IRTmodel_EmIn_3pl)
+item.fit(IRTmodel_EmIn_3pl)
+
+##EmIn redefine (can remove individual items for various reasons, then re-run above code for comparisons)
+Imp_1_EmIn = Imp_1[ , c(198, 207, 214, 221, 228, 246)]
