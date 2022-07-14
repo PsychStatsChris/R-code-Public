@@ -1,0 +1,75 @@
+library(lavaan)
+library(haven)
+library(semPlot)
+
+#load data set
+Imp_1 <- read_sav("____")
+
+#Opens data viewer
+View(Imp_1)
+
+#specifying the model from data (# can be used to remove any subscale from model)
+NewImp.model<-'
+            NPU =~ U10_R + U15_R + U20_R + U25_R + U30_R + U35_R + U40_R + U45_R + U49_R + U52_R
+            NNU =~ BIS_22 + BIS_25 + BIS_26 + U2_R + U17_R + U22_R + U58_R
+            NEI =~ EII_17 + EII_26 + EII_32 + EII_38R + EII_44R + EII_62
+            NSS =~ U18_R + U26_R + U36_R + U51_R + U56_R
+            NPrem =~ BIS1_r + BIS12_r + UPPS_P_6 + UPPS_P_16 + UPPS_P_28 + UPPS_P_33 + UPPS_P_48 + UPPS_P_55 
+            NPers =~ UPPS_P_4 + UPPS_P_27 + UPPS_P_37 + UPPS_P_42
+'
+
+#fit the model
+NewImp_fit <- cfa(NewImp.model,data=Imp_1)
+NewImp_fit
+summary(NewImp_fit,fit.measures=TRUE)
+summary(NewImp_fit, standardized=TRUE)
+
+#standarized loadings
+inspect()
+
+#All fit measures
+fitmeasures(NewImp_fit)
+
+#commonly reported fit measures
+fitmeasures(NewImp_fit,c("gfi","agfi","nfi","cfi","rmsea","rmsea.ci.lower","rmsea.ci.upper","rmsea.pvalue","srmr","tli"))
+
+#Display figure
+semPaths(NewImp_fit,"std")
+
+
+
+
+############Theoretical hierarchical model
+
+HNewImp.model<-'
+            NPU =~ U10_R + U15_R + U20_R + U25_R + U30_R + U35_R + U40_R + U45_R + U49_R + U52_R
+            NNU =~ BIS_22 + BIS_25 + BIS_26 + U2_R + U17_R + U22_R + U58_R
+            NEI =~ EII_17 + EII_26 + EII_32 + EII_38R + EII_44R + EII_62
+            NSS =~ U18_R + U26_R + U36_R + U51_R + U56_R
+            NPrem =~ BIS1_r + BIS12_r + UPPS_P_6 + UPPS_P_16 + UPPS_P_28 + UPPS_P_33 + UPPS_P_48 + UPPS_P_55 
+            NPers =~ UPPS_P_4 + UPPS_P_27 + UPPS_P_37 + UPPS_P_42
+
+            
+            NIntEm =~ NNU + NPU 
+            NCon =~ NPrem + NPers  
+            
+            
+            
+'
+
+
+#fit the model
+HNewImp_fit <- cfa(HNewImp.model,data=Imp_1)
+HNewImp_fit
+summary(HNewImp_fit,fit.measures=TRUE)
+summary(HNewImp_fit, standardized=TRUE)
+
+#standarized loadings
+inspect()
+
+
+fitmeasures(HNewImp_fit)
+fitmeasures(HNewImp_fit,c("gfi","agfi","nfi","cfi","rmsea","rmsea.ci.lower","rmsea.ci.upper","rmsea.pvalue","srmr","tli"))
+
+semPaths(HNewImp_fit,"std")
+
